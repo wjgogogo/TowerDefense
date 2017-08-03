@@ -8,7 +8,7 @@ public class Bullet : MonoBehaviour
     public float speed = 20;
     public GameObject explosionEffectPrefab;
     private Transform target;
-    private float distanceArriveTarget = 0.5f;
+    private float distanceArriveTarget = 0.6f;
 
     public void SetTarget(Transform _target)
     {

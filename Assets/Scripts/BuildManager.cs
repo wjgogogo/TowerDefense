@@ -13,7 +13,12 @@ public class BuildManager : MonoBehaviour
     public TurretData missileTurretData;
     public TurretData standardTurretData;
 
+    public GameObject upgradeCanvas;
+    public Button upgradeButton;
+    public Text upgradeText;
     private TurretData selectTurretData;
+
+    private MapCube selectMapCube;
 
     public void OnLaserSelect(bool isOn)
     {
@@ -39,21 +44,26 @@ public class BuildManager : MonoBehaviour
         }
     }
 
-    private void ChangeMoney(int change = 0)
+    public void ChangeMoney(int change = 0)
     {
         money += change;
         moneyText.text = "￥" + money;
     }
 
-    public GameObject upgradeCanvas;
-    public Button upgradeButton;
-    public MapCube selectMapCube;
+    private void ShowUpgradeUI(Vector3 pos, bool isDisableUpgrade = false, int upgradeMoney = 0)
 
-    private void ShowUpgradeUI(Vector3 pos, bool isDisableUpgrade = false)
     {
         upgradeCanvas.SetActive(true);
         upgradeCanvas.transform.position = pos;
         upgradeButton.interactable = !isDisableUpgrade;
+        if (upgradeButton.interactable)
+        {
+            upgradeText.text = "升级(￥" + upgradeMoney + ")";
+        }
+        else
+        {
+            upgradeText.text = "不能再升级";
+        }
     }
 
     private void HideUpgradeUI()
@@ -63,14 +73,20 @@ public class BuildManager : MonoBehaviour
 
     public void OnUpgradeButtonDown()
     {
-        Debug.Log("OK");
-        selectMapCube.UpgradeTurret();
-        HideUpgradeUI();
+        if (money >= selectMapCube.turretData.costUpgrade)
+        {
+            ChangeMoney(-selectMapCube.turretData.costUpgrade);
+            selectMapCube.UpgradeTurret();
+            HideUpgradeUI();
+        }
+        else
+        {
+            moneyAnim.SetTrigger("Filck");
+        }
     }
 
     public void OnDestroyButtonDown()
     {
-        Debug.Log("Cancel");
         selectMapCube.DestroyTurret();
         HideUpgradeUI();
     }
@@ -107,7 +123,7 @@ public class BuildManager : MonoBehaviour
                         }
                         else
                         {
-                            ShowUpgradeUI(mapCube.transform.position, mapCube.isUpgrade);
+                            ShowUpgradeUI(mapCube.transform.position, mapCube.isUpgrade, mapCube.turretData.costUpgrade);
                         }
                         selectMapCube = mapCube;
                     }

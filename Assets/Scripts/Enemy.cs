@@ -9,6 +9,8 @@ public class Enemy : MonoBehaviour
 {
     public float speed = 10;
     public float hp = 100;
+    public int getMoney = 50;
+    public Transform body;
     public Slider hpSlider;
     public GameObject explosion;
     private Transform[] wayPoints;
@@ -19,6 +21,7 @@ public class Enemy : MonoBehaviour
         wayPoints = WayPoints.wayPoints;
         hpSlider.maxValue = hp;
         hpSlider.value = hp;
+        body.LookAt(wayPoints[index]);
     }
 
     private void Update()
@@ -35,11 +38,16 @@ public class Enemy : MonoBehaviour
         }
 
         transform.Translate((wayPoints[index].position - transform.position).normalized * Time.deltaTime * speed);
-        if (Vector3.Distance(wayPoints[index].position, transform.position) < 0.2f)
+
+        if (Vector3.Distance(wayPoints[index].position, transform.position) < 0.5f)
+        {
             index++;
+            if (index < wayPoints.Length - 1)
+                body.LookAt(wayPoints[index]);
+        }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         hp -= damage;
         hpSlider.value = hp;
@@ -51,6 +59,7 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
+        GameObject.Find("GameManager").SendMessage("ChangeMoney", getMoney);
         GameObject effect = Instantiate(explosion, transform.position, transform.rotation);
         Destroy(effect, 0.5f);
         Destroy(gameObject);
@@ -58,6 +67,8 @@ public class Enemy : MonoBehaviour
 
     private void ReachDestination()
     {
+        GameObject.Find("EndCube").SendMessage("ChangeHp");
+
         Destroy(gameObject);
     }
 

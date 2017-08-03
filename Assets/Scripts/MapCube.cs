@@ -15,7 +15,9 @@ public class MapCube : MonoBehaviour
     [HideInInspector]
     public bool isUpgrade = false;
 
-    private TurretData turretData;
+    [HideInInspector]
+    public TurretData turretData;
+
     private Renderer render;
 
     private void Start()
